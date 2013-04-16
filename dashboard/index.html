@@ -1,0 +1,15 @@
+<script src="/socket.io/socket.io.js"></script>
+
+<p><span id="temperature_celcius">00.000</span>&#186;c</p>
+
+<p><span id="temperature_fahrenheit">00.000</span>&#186;f</p>
+
+<script>
+  var socket = io.connect('http://localhost');
+	socket.on('temperature', function (data) {
+    console.log(data);
+		
+		document.getElementById('temperature_celcius').innerHTML = data.celcius;
+		document.getElementById('temperature_fahrenheit').innerHTML = data.fahrenheit;
+  });
+</script>
