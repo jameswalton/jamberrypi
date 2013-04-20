@@ -1,9 +1,9 @@
 var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs')
-var fileLocation = '../temperature/w1_slave';
+var fileLocation = '/sys/bus/w1/devices/28-000003b74282/w1_slave';
 
-app.listen(8888);
+app.listen(8124);
 
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',
