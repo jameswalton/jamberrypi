@@ -5,6 +5,16 @@ var fileLocation = '/sys/bus/w1/devices/28-000003b74282/w1_slave';
 
 app.listen(8124);
 
+function getTemperature() {
+  fs.readFile(fileLocation, 'utf8', function(err, data) {
+    if (err) throw err;
+    matches = data.match(/t=([0-9]+)/);
+    temperatureC = parseInt(matches[1]) / 1000;
+    temperatureF = ((temperatureC * 1.8) + 32).toFixed(3);
+    socket.emit('temperature', { celcius: temperatureC, fahrenheit: temperatureF });
+  });
+};
+
 function handler (req, res) {
   fs.readFile(__dirname + '/index.html',
   function (err, data) {
@@ -13,13 +23,7 @@ function handler (req, res) {
       return res.end('Error loading index.html');
     }
     io.sockets.on('connection', function (socket) {
-      fs.readFile(fileLocation, 'utf8', function(err, data) {
-        if (err) throw err;
-        matches = data.match(/t=([0-9]+)/);
-        temperatureC = parseInt(matches[1]) / 1000;
-        temperatureF = ((temperatureC * 1.8) + 32).toFixed(3);
-        socket.emit('temperature', { celcius: temperatureC, fahrenheit: temperatureF });
-      });
+      getTemperature();
     });
     res.writeHead(200);
     res.end(data);
@@ -27,12 +31,6 @@ function handler (req, res) {
 }
 io.sockets.on('connection', function (socket) {
   setInterval(function() {
-    fs.readFile(fileLocation, 'utf8', function(err, data) {
-      if (err) throw err;
-      matches = data.match(/t=([0-9]+)/);
-      temperatureC = parseInt(matches[1]) / 1000;
-      temperatureF = ((temperatureC * 1.8) + 32).toFixed(3);
-      socket.emit('temperature', { celcius: temperatureC, fahrenheit: temperatureF });
-    });
+    getTemperature();
   }, 5000);
 });
